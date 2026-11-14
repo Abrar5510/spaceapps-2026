@@ -84,7 +84,7 @@ def main():
     warn, s = add(unreal.TextBlock, "TxtWarn", root)
     text(warn, "", 26, (1.0, 0.25, 0.2, 1), bold=True)
     warn.set_editor_property("justification", unreal.TextJustify.CENTER)
-    place(s, 0, 30, 900, 0, anchor=(0.5, 0), align=(0.5, 0), auto=True)
+    place(s, 0, 0, 900, 0, anchor=(0.5, 0.3), align=(0.5, 0.5), auto=True)
 
     # Rover photo card, right side (shown near a stop).
     card, s = panel("StopCard", root, 0.7)

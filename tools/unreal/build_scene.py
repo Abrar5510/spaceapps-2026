@@ -29,9 +29,12 @@ def import_mesh(src, folder, name, nanite=False, complex_collision=False, reimpo
         ns.set_editor_property("fallback_percent_triangles", 1.0)  # keep full detail for collision
         sme.set_nanite_settings(m, ns, apply_changes=True)
     if complex_collision:
+        # Walk on the real DTM surface: drop the importer's convex hull and use the triangles for all queries.
+        sme.remove_collisions(m)
         body = m.get_editor_property("body_setup")
         body.set_editor_property("collision_trace_flag", unreal.CollisionTraceFlag.CTF_USE_COMPLEX_AS_SIMPLE)
         m.set_editor_property("body_setup", body)
+        sme.set_nanite_settings(m, m.get_editor_property("nanite_settings"), apply_changes=True)  # forces a rebuild
     assets.save_loaded_asset(m)
     return m
 
@@ -46,7 +49,8 @@ def place_mesh(mesh, label, material=None, loc=V(0, 0, 0), rot=R(0, 0, 0), scale
             c.set_material(i, material)
     c.set_editor_property("cast_shadow", shadows)
     if not collide:
-        c.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+        sme.remove_collisions(mesh)  # the importer's convex hull would span the whole route
+        c.set_collision_profile_name("NoCollision")
     return a
 
 
@@ -75,7 +79,7 @@ def main():
         place_mesh(m, name, terrain_mat)
 
     # Route lines (walk + plan) and stop beacons.
-    walk = place_mesh(import_mesh(os.path.join(SITE, "route_walk.glb"), f"{GAME}/Route", "route_walk"),
+    walk = place_mesh(import_mesh(os.path.join(SITE, "route_walk.glb"), f"{GAME}/Route", "route_walk", reimport="--route" in sys.argv),
                       "RouteWalk", load(f"{GAME}/M_Route"), shadows=False, collide=False)
     plan = place_mesh(import_mesh(os.path.join(SITE, "route_plan.glb"), f"{GAME}/Route", "route_plan"),
                       "RoutePlan", load(f"{GAME}/M_Route"), shadows=False, collide=False)
@@ -123,8 +127,8 @@ def main():
         # Thin CO2 (~1/150 of Earth's Rayleigh) and suspended dust: optical depth ~0.6 over an 11 km
         # scale height (~0.05/km), absorbing blue more than red -> butterscotch sky, bluish near the Sun.
         "rayleigh_scattering_scale": 0.0002, "rayleigh_exponential_distribution": 11.0,
-        "mie_scattering": unreal.LinearColor(1.0, 0.72, 0.52, 1), "mie_scattering_scale": 0.045,
-        "mie_absorption": unreal.LinearColor(0.08, 0.3, 0.7, 1), "mie_absorption_scale": 0.02,
+        "mie_scattering": unreal.LinearColor(1.0, 0.6, 0.36, 1), "mie_scattering_scale": 0.045,
+        "mie_absorption": unreal.LinearColor(0.03, 0.3, 0.95, 1), "mie_absorption_scale": 0.035,
         "mie_anisotropy": 0.7, "mie_exponential_distribution": 11.0,
         "other_absorption_scale": 0.0, "ground_albedo": unreal.Color(170, 110, 70, 255),
     }.items():

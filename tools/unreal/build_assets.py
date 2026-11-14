@@ -118,11 +118,14 @@ def terrain_material(ortho, slope, thermal, hazard, detail, collection, n):
     flat.set_editor_property("constant", unreal.LinearColor(0, 0, 1, 0))
     dist = node(unreal.MaterialExpressionPixelDepth, -800, 1750)
     fade_k = node(unreal.MaterialExpressionConstant, -800, 1850)
-    fade_k.set_editor_property("r", 1.0 / 4000.0)
+    fade_k.set_editor_property("r", 1.0 / 2500.0)
     fd = node(unreal.MaterialExpressionMultiply, -600, 1750)
     mel.connect_material_expressions(dist, "", fd, "A"); mel.connect_material_expressions(fade_k, "", fd, "B")
+    fadd = node(unreal.MaterialExpressionAdd, -520, 1750)
+    mel.connect_material_expressions(fd, "", fadd, "A")
+    fadd.set_editor_property("const_b", 0.45)  # keep the grit subtle even underfoot
     fs = node(unreal.MaterialExpressionSaturate, -450, 1750)
-    mel.connect_material_expressions(fd, "", fs, "")
+    mel.connect_material_expressions(fadd, "", fs, "")
     nl = node(unreal.MaterialExpressionLinearInterpolate, -200, 1500)
     mel.connect_material_expressions(dn, "RGB", nl, "A"); mel.connect_material_expressions(flat, "", nl, "B")
     mel.connect_material_expressions(fs, "", nl, "Alpha")
@@ -167,7 +170,7 @@ def main():
     texture("route_map.png", "T_RouteMap", group=unreal.TextureGroup.TEXTUREGROUP_UI)
     c = mpc()
     terrain_material(ortho, slope, thermal, hazard, detail, c, n)
-    emissive_material("M_Route", (0.25, 0.85, 1.0), 2500.0)  # nits: must compete with ~55k lux sunlight
+    emissive_material("M_Route", (0.25, 0.85, 1.0), 900.0)  # nits: must compete with ~55k lux sunlight
     emissive_material("M_Stop", (1.0, 0.75, 0.2), 4000.0)
     save_all()
     print("assets ok:", sorted(assets.list_assets(GAME, recursive=True)))

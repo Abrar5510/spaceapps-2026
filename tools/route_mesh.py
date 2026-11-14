@@ -38,7 +38,7 @@ def ribbon(pts, width, lift, path):
 def main():
     rows = list(csv.DictReader(open(SITE / "route.csv")))
     pts = [(float(r["X"]), float(r["Y"]), float(r["Z"])) for r in rows]
-    ribbon(pts, 60, 20, SITE / "route_walk.glb")        # 0.6 m line, 20 cm above ground
+    ribbon(pts, 30, 8, SITE / "route_walk.glb")         # 0.3 m line, 8 cm above ground
     ribbon(pts[::3] + [pts[-1]], 700, 150, SITE / "route_plan.glb")  # 7 m line for the overhead view
     print(len(pts), "route samples -> route_walk.glb, route_plan.glb")
 

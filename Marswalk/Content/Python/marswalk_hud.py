@@ -16,7 +16,7 @@ SLOPE_LIMIT = 20.0
 OFF_ROUTE_M = 15.0
 STOP_RADIUS_M = 25.0
 LAYERS = ["HiRISE 25 cm image", "Slope (green flat, red >20°)",
-          "THEMIS thermal inertia (yellow sand, purple bedrock)", "Hazards: no-go in red"]
+          None, "Hazards: no-go in red (slope >20° or rock >0.5 m)"]
 
 
 def _csv(name):
@@ -41,6 +41,8 @@ def _load():
 
 
 ROUTE, STOPS, PHOTOS, STATS, COND, STOP_IDX, CUM = _load()
+_ti = json.load(open(os.path.join(SITE, "site.json")))["thermal_inertia_range"]
+LAYERS[2] = f"THEMIS thermal inertia {_ti[0]:.0f}-{_ti[1]:.0f} SI (yellow loose, purple firm)"
 _hm = lambda t: int(t[:2]) + int(t[3:]) / 60
 SUNSET = _hm(COND["sunset_lmst"])
 DEC = math.asin(math.sin(math.radians(25.19)) * math.sin(math.radians(COND["ls_deg"])))
@@ -90,7 +92,7 @@ def plan_text():
 
 def _key(name):
     k = unreal.Key()
-    k.set_editor_property("key_name", name)
+    k.import_text(name)  # works in -game too (set_editor_property is editor-only for this struct)
     return k
 
 
@@ -107,6 +109,7 @@ class Hud:
         self.sun = unreal.GameplayStatics.get_actor_of_class(world, unreal.DirectionalLight)
         self.manager = unreal.GameplayStatics.get_actor_of_class(world, unreal.load_class(None, "/Game/Marswalk/BP_Marswalk.BP_Marswalk_C"))
         self.plan_only = unreal.GameplayStatics.get_all_actors_with_tag(world, "PlanOnly")
+        self.labels = unreal.GameplayStatics.get_all_actors_with_tag(world, "BeaconLabel")
         unreal.MaterialLibrary.set_scalar_parameter_value(world, self.mpc, "Layer", 0.0)
         for a in self.plan_only:
             a.set_actor_hidden_in_game(True)
@@ -159,6 +162,10 @@ class Hud:
         if self.widget is None:
             self.widget = self.find_widget(pc)
             self.text("TxtStats", plan_text())
+            warn = self.w("TxtWarn")  # readable against a bright dusty sky
+            warn.set_shadow_offset(unreal.Vector2D(2, 2))
+            warn.set_shadow_color_and_opacity(unreal.LinearColor(0, 0, 0, 0.9))
+            warn.set_color_and_opacity(unreal.SlateColor(unreal.LinearColor(1.0, 0.18, 0.12, 1)))
             ps = unreal.GameplayStatics.get_actor_of_class(world, unreal.PlayerStart)
             if ps and (pawn.get_actor_location() - ps.get_actor_location()).length() > 500:
                 # PIE can spawn at the editor camera; every walk starts at the habitat.
@@ -182,6 +189,9 @@ class Hud:
 
         # navigation along the planned route
         loc = pawn.get_actor_location()
+        for lab in self.labels:  # stop numbers face the walker (text renders are one-sided)
+            l = lab.get_actor_location()
+            lab.set_actor_rotation(unreal.Rotator(roll=0, pitch=0, yaw=math.degrees(math.atan2(loc.y - l.y, loc.x - l.x))), False)
         i, off_m = nearest(loc.x, loc.y)
         nxt = next((k for k in range(1, len(STOPS)) if STOP_IDX[k] > i + 2), 0)
         tgt = ROUTE[STOP_IDX[nxt]] if nxt else ROUTE[-1]
@@ -220,7 +230,7 @@ class Hud:
         # rover photo card when near a stop; plan card in plan view
         card = next((k for k in range(len(STOPS))
                      if math.hypot(ROUTE[STOP_IDX[k]][0] - loc.x, ROUTE[STOP_IDX[k]][1] - loc.y) / 100 < STOP_RADIUS_M), -1)
-        self.show("StopCard", card >= 0 and not self.plan)
+        self.show("StopCard", card >= 0 and not self.plan and not self.storm)  # storm warning takes over
         for k in range(5):
             self.show(f"ImgStop{k}", k == card)
         if card >= 0:

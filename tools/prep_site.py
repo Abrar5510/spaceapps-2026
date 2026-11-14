@@ -142,7 +142,8 @@ def main():
     # Colour layers for the Unreal layer material.
     save_layer(ramp(slope / 30, [(0, (40, 140, 60)), (0.33, (230, 220, 60)), (0.66, (240, 120, 30)), (1, (200, 20, 20))]),
                "layer_slope.png")
-    save_layer(ramp((ti - 200) / 400, [(0, (240, 210, 90)), (0.4, (200, 120, 60)), (1, (60, 40, 120))]),
+    # Stretch to this site's range (THEMIS TI varies little over 2 km); the HUD legend states the range.
+    save_layer(ramp((ti - ti.min()) / (ti.max() - ti.min()), [(0, (250, 225, 90)), (0.5, (205, 110, 55)), (1, (70, 40, 140))]),
                "layer_thermal.png")
 
     detail_normal()
