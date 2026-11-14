@@ -1,9 +1,48 @@
-# NASA Space Apps Challenge 2026
+# Dust & Bearings — Marswalk
 
-Hackathon: November 14–15, 2026 · Universal Event · Challenge: not chosen yet
+NASA Space Apps Challenge 2026 · Universal Event · Challenge: [Interplanetary Survival Guide: Martian Map](challenges/interplanetary-survival-guide-martian-map.md)
+Team page: https://www.spaceappschallenge.org/2026/find-a-team/dust-bearings/
 
-- [CHALLENGES.md](CHALLENGES.md) — all 14 challenges: difficulty, subjects, summaries
-- [RESOURCES.md](RESOURCES.md) — every resource link, grouped by challenge
-- [challenges/](challenges/) — full Details + Resources text for each challenge
+A realistic Unreal Engine 5.8 view of **one** Martian site that an astronaut uses to plan and walk a route on foot (a Marswalk). It runs in the browser through Pixel Streaming.
 
-Official pages: [challenges](https://www.spaceappschallenge.org/2026/challenges/) · [find a team](https://www.spaceappschallenge.org/2026/find-a-team/) · [participant FAQs](https://www.spaceappschallenge.org/faq/)
+## What the brief asks for
+
+- [ ] One hyperlocal location or route, not a global map. Global tools like Mars Trek don't go down to this scale.
+- [ ] A science objective that justifies the site. The brief's example is boxwork at Mount Sharp, which Curiosity studied in 2025.
+- [ ] At least 3 data types layered together: optical, thermal, spectral, topographic, geophysical, atmospheric, radiation or chemical.
+- [ ] A walking route that avoids obstacles such as large rocks. Plan it for someone moving slowly in a suit with gear.
+- [ ] Safety info, e.g. radiation and space weather.
+- [ ] Optional: rover point-of-view images so the crew knows what to expect.
+- [ ] A display format: habitat screen, handheld tablet, or helmet HUD.
+
+## Layout
+
+```
+Marswalk/        UE 5.8 project (Pixel Streaming 2 enabled; Lumen, Nanite, VSM on)
+data/raw/        NASA downloads, git-ignored
+challenges/      all 14 challenge briefs + resources (reference)
+CHALLENGES.md    challenge index
+RESOURCES.md     every resource link by challenge
+```
+
+Unreal assets (`.uasset`, `.umap`) and imagery are stored in Git LFS.
+
+## Run in the browser (Pixel Streaming 2)
+
+1. One-time: fetch Epic's signalling and web server:
+   `/Volumes/Transend/Apps/UE_5.8/Engine/Plugins/Media/PixelStreaming2/Resources/WebServers/get_ps_servers.sh`
+2. Open `Marswalk/Marswalk.uproject` in UE 5.8.
+3. On the Pixel Streaming toolbar, launch the signalling server and start streaming the viewport.
+4. Open http://localhost in a browser. To reach it from another device, open `http://<this-mac-ip>` on the same network.
+
+The stream only works while this Mac is running the editor or a packaged build. Judging happens later, so the submission's public links have to be the repo and the demo video. The live stream is for presenting.
+
+## Submission form (Project tab) needs
+
+- Project name and a 50–200 word summary
+- **Demo**: a video of 30 seconds or less, or at most 7 slides, at a public link
+- **Project link**: public with no login, so this repo must be made public before submitting
+- Project details: how it works, tools used, impact
+- Super Intelligence (SI) use disclosure. Any SI-generated images or video need a visible watermark. Code and data need the SI use acknowledged in text or metadata.
+- Every NASA dataset used, plus every other dataset, tool, code library, text or image
+- Original-work and terms checkboxes, then **Submit for Judging** (saving alone does not submit)

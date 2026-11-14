@@ -1,3 +1,16 @@
 .DS_Store
 .venv/
 __pycache__/
+
+# Unreal generated
+Marswalk/Binaries/
+Marswalk/Build/
+Marswalk/DerivedDataCache/
+Marswalk/Intermediate/
+Marswalk/Saved/
+Marswalk/Platforms/
+*.xcworkspace
+*.xcodeproj
+
+# Raw NASA downloads (large; fetch locally)
+data/raw/

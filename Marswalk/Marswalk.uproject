@@ -1,0 +1,9 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.8",
+	"Category": "",
+	"Description": "Hyperlocal Marswalk planner for the NASA Space Apps 2026 Martian Map challenge",
+	"Plugins": [
+		{ "Name": "PixelStreaming2", "Enabled": true }
+	]
+}
