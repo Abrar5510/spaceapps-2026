@@ -29,11 +29,16 @@ Unreal assets (`.uasset`, `.umap`) and imagery are stored in Git LFS.
 
 ## Run in the browser (Pixel Streaming 2)
 
-1. One-time: fetch Epic's signalling and web server:
-   `/Volumes/Transend/Apps/UE_5.8/Engine/Plugins/Media/PixelStreaming2/Resources/WebServers/get_ps_servers.sh`
-2. Open `Marswalk/Marswalk.uproject` in UE 5.8.
-3. On the Pixel Streaming toolbar, launch the signalling server and start streaming the viewport.
-4. Open http://localhost in a browser. To reach it from another device, open `http://<this-mac-ip>` on the same network.
+The signalling and web server is already installed: Epic's `UE5.8` branch, built on 2026-11-14 and tested.
+
+1. Start the server and leave it running:
+   `/Volumes/Transend/Apps/UE_5.8/Engine/Plugins/Media/PixelStreaming2/Resources/WebServers/SignallingWebServer/platform_scripts/bash/start.sh --nosudo --publicip 127.0.0.1`
+   It serves the browser page on port 80 and waits for Unreal on port 8888.
+2. Open `Marswalk/Marswalk.uproject` in UE 5.8. On the Pixel Streaming toolbar, start streaming the viewport to `ws://127.0.0.1:8888`.
+3. Open http://localhost in a browser. To reach it from another device, open `http://<this-mac-ip>` on the same network.
+
+If it ever needs reinstalling, run `get_ps_servers.sh -b UE5.8` from that `WebServers` folder. Without `-b`, the script that ships with 5.8 fetches the UE5.7 branch.
+Don't run `node dist/index.js` directly. The downloaded `config.json` points its web root at a Windows path, and `start.sh` overrides that.
 
 The stream only works while this Mac is running the editor or a packaged build. Judging happens later, so the submission's public links have to be the repo and the demo video. The live stream is for presenting.
 
