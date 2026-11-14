@@ -14,3 +14,11 @@ Marswalk/Platforms/
 
 # Raw NASA downloads (large; fetch locally)
 data/raw/
+
+# local scratch
+.scratch/
+
+# rebuilt by tools/terrain_mesh.py
+data/site/terrain/
+data/site/grids.npz
+data/site/nogo.npy

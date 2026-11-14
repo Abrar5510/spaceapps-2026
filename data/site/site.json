@@ -1,0 +1,44 @@
+{
+  "name": "Boxwork ridges, Mount Sharp, Gale crater",
+  "srs": "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=137.38 +x_0=0 +y_0=0 +R=3396190.0 +units=m +no_defs",
+  "box_m": [
+    -920,
+    -286001,
+    1097,
+    -283984
+  ],
+  "samples": 2017,
+  "metres_per_sample": 1.0,
+  "corners_lonlat": {
+    "nw": [
+      137.36447904353054,
+      -4.790981850026992
+    ],
+    "ne": [
+      137.39850705352936,
+      -4.790981850026992
+    ],
+    "sw": [
+      137.36447904353054,
+      -4.825009860025811
+    ],
+    "se": [
+      137.39850705352936,
+      -4.825009860025811
+    ]
+  },
+  "elev_min_m": -3849.5927734375,
+  "elev_max_m": -3362.802978515625,
+  "landscape": {
+    "scale_xy_cm": 100.0,
+    "scale_z_cm": 95.07613182067871,
+    "actor_z_cm": 0.0,
+    "note": "world z (m) = elevation - (min+max)/2; UE X = east (col), UE Y = south (row)"
+  },
+  "thermal_inertia_range": [
+    322.8782043457031,
+    440.05279541015625
+  ],
+  "slope_p99_deg": 47.74764633178711,
+  "rough_p99_m": 0.493896484375
+}

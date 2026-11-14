@@ -1,0 +1,6 @@
+Name,Title,Sol,Lon,Lat,X,Y,Z,DistM,WalkS,Note
+0,Habitat,4541,137.385926,-4.797816,127100.0,40500.0,-3229.7,0.0,0,"Flat, firm ground north of the boxwork; Curiosity parked here on sol 4541."
+1,Ridge stop,4628,137.379460,-4.805990,88800.0,88900.0,470.2,655.7,1378,Boxwork ridge crest: cemented ridge rock where groundwater once flowed through fractures.
+2,Monte Grande hollow,4693,137.381035,-4.807839,98100.0,99900.0,1030.4,806.7,1681,Hollow between ridges; Curiosity drilled 'Valle de la Luna' here (sol 4693).
+3,Nevado Sajama ridge,4718,137.381004,-4.808008,97800.0,100900.0,1164.7,819.2,1720,Ridge beside the hollow; Curiosity drilled 'Nevado Sajama' here (sol 4718). Pair it with the hollow sample.
+4,South boxwork margin,4855,137.382148,-4.812849,104700.0,129600.0,3545.1,1120.1,2360,Where the boxwork network fades; sample the edge to bracket how far the groundwater reached.

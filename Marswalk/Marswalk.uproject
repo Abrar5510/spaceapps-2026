@@ -4,6 +4,11 @@
 	"Category": "",
 	"Description": "Hyperlocal Marswalk planner for the NASA Space Apps 2026 Martian Map challenge",
 	"Plugins": [
-		{ "Name": "PixelStreaming2", "Enabled": true }
+		{ "Name": "PixelStreaming2", "Enabled": true },
+		{ "Name": "PythonScriptPlugin", "Enabled": true },
+		{ "Name": "EditorScriptingUtilities", "Enabled": true },
+		{ "Name": "ToolsetRegistry", "Enabled": true, "TargetAllowList": [ "Editor" ] },
+		{ "Name": "EditorToolset", "Enabled": true, "TargetAllowList": [ "Editor" ] },
+		{ "Name": "UMGToolSet", "Enabled": true, "TargetAllowList": [ "Editor" ] }
 	]
 }

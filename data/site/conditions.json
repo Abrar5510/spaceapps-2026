@@ -1,0 +1,17 @@
+{
+  "sol": 4693,
+  "earth_date": "2025-10-19",
+  "ls_deg": 157.0,
+  "season": "Month 6",
+  "air_min_c": -74,
+  "air_max_c": -3,
+  "ground_min_c": -89,
+  "ground_max_c": 10,
+  "pressure_pa": 686,
+  "uv_index": "Moderate",
+  "opacity": "Sunny",
+  "sunrise_lmst": "05:27",
+  "sunset_lmst": "17:21",
+  "lmst_to_ltst_h": 0.6,
+  "source": "Curiosity REMS via mars.nasa.gov weather API (Centro de Astrobiologia / NASA JPL)"
+}

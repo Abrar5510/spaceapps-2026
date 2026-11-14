@@ -1,0 +1,52 @@
+{
+  "distance_m": 2044.9,
+  "climb_m": 112.5,
+  "steepest_slope_deg": 19.7,
+  "walk_time_min": 65.0,
+  "stop_time_min": 120,
+  "eva_time_h": 3.08,
+  "dose_quiet_mGy": 0.027,
+  "dose_quiet_mSv": 0.0822,
+  "dose_storm_mGy": 1.041,
+  "dose_rates": {
+    "quiet_mGy_day": 0.21,
+    "quiet_mSv_day": 0.64,
+    "storm_mGy_day": 8.1
+  },
+  "assumptions": {
+    "pace_flat_m_s": 0.7,
+    "slope_limit_deg": 20.0,
+    "rough_limit_m": 0.5,
+    "sand_ti": 350.0,
+    "sand_penalty": 0.3,
+    "stop_minutes": 30
+  },
+  "nogo_fraction": 0.286,
+  "stops": [
+    {
+      "name": "Habitat",
+      "sol": 4541,
+      "dist_m": 0.0
+    },
+    {
+      "name": "Ridge stop",
+      "sol": 4628,
+      "dist_m": 655.7
+    },
+    {
+      "name": "Monte Grande hollow",
+      "sol": 4693,
+      "dist_m": 806.7
+    },
+    {
+      "name": "Nevado Sajama ridge",
+      "sol": 4718,
+      "dist_m": 819.2
+    },
+    {
+      "name": "South boxwork margin",
+      "sol": 4855,
+      "dist_m": 1120.1
+    }
+  ]
+}
