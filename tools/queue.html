@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marswalk live</title>
+<style>
+  :root { --bg: #140b07; --panel: #24140d; --text: #f3e6dc; --muted: #c4a898; --accent: #e07a3f; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .card { max-width: 30rem; margin: 18vh auto 0; padding: 2rem 1.5rem; text-align: center; }
+  h1 { margin: 0 0 .25rem; font-size: 1.6rem; letter-spacing: .02em; }
+  .big { font-size: 3.5rem; font-weight: 700; color: var(--accent); margin: 1rem 0 .25rem; }
+  p { color: var(--muted); margin: .5rem 0; }
+  a { color: var(--accent); }
+  button { margin-top: 1.25rem; padding: .7rem 1.4rem; border: 0; border-radius: .5rem;
+    background: var(--accent); color: #1b0d06; font: inherit; font-weight: 600; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+  #play { position: fixed; inset: 0; display: none; }
+  #play iframe { width: 100%; height: 100%; border: 0; display: block; }
+  #bar { position: fixed; top: .5rem; left: 50%; transform: translateX(-50%); display: none;
+    padding: .3rem .8rem; border-radius: 1rem; background: rgba(20,11,7,.8); font-size: .9rem; z-index: 2; }
+</style>
+</head>
+<body>
+<main class="card" id="card" aria-live="polite">
+  <h1>Marswalk</h1>
+  <p>Joining the line…</p>
+</main>
+<div id="bar" role="status"></div>
+<div id="play"></div>
+<script>
+const card = document.getElementById('card'), bar = document.getElementById('bar'), play = document.getElementById('play');
+const VIDEO = 'https://github.com/Abrar5510/spaceapps-2026#readme';
+let id = null, timer = null, failures = 0;
+
+function show(html) { card.innerHTML = '<h1>Marswalk</h1>' + html; card.style.display = 'block'; }
+function mmss(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function stopPlaying() { play.innerHTML = ''; play.style.display = 'none'; bar.style.display = 'none'; }
+
+async function join() {
+  stopPlaying();
+  show('<p>Joining the line…</p>');
+  try {
+    id = (await (await fetch('/queue/join', { method: 'POST' })).json()).id;
+    failures = 0;
+    poll();
+  } catch (e) { offline(); }
+}
+
+function startPlaying() {
+  if (play.firstChild) return;
+  const ws = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+  const f = document.createElement('iframe');
+  f.src = '/player.html?ss=' + encodeURIComponent(ws);
+  f.allow = 'autoplay; fullscreen';
+  f.title = 'Marswalk live stream';
+  play.appendChild(f);
+  play.style.display = 'block';
+  card.style.display = 'none';
+  f.focus();
+}
+
+async function poll() {
+  clearTimeout(timer);
+  let s;
+  try {
+    s = await (await fetch('/queue/status?id=' + id)).json();
+    failures = 0;
+  } catch (e) {
+    if (++failures >= 3) return offline();
+    timer = setTimeout(poll, 2000);
+    return;
+  }
+  if (s.pos === -1) {
+    stopPlaying();
+    show('<p>Your turn is over. Thanks for walking on Mars!</p><button onclick="join()">Join the line again</button>');
+    return;
+  }
+  if (s.pos === 0) {
+    startPlaying();
+    if (s.turn_left !== null) {
+      bar.textContent = s.waiting + (s.waiting === 1 ? ' person' : ' people') + ' waiting · ' + mmss(s.turn_left) + ' left';
+      bar.style.display = 'block';
+    } else {
+      bar.style.display = 'none';
+    }
+  } else {
+    stopPlaying();
+    show('<p>One person plays at a time.</p><div class="big">#' + s.pos + '</div>' +
+      '<p>' + (s.pos === 1 ? 'You’re next.' : (s.pos - 1) + ' ahead of you.') +
+      ' Turns last up to ' + (s.turn_seconds / 60) + ' minutes while others wait.</p>' +
+      '<p>Keep this tab open to hold your place. Meanwhile, <a href="' + VIDEO + '" target="_blank" rel="noopener">watch the demo video</a>.</p>');
+  }
+  timer = setTimeout(poll, 2000);
+}
+
+function offline() {
+  stopPlaying();
+  show('<p>The live demo is offline right now.</p><p><a href="' + VIDEO + '">Watch the demo video and read about the project</a>.</p><button onclick="join()">Try again</button>');
+}
+
+addEventListener('pagehide', () => { if (id) navigator.sendBeacon('/queue/leave?id=' + id); });
+join();
+</script>
+</body>
+</html>

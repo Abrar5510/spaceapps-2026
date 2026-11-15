@@ -1,7 +1,7 @@
 #!/bin/bash
 # Host the Marswalk demo at play.marswalk.earth.
 # Starts the Pixel Streaming 2 signalling server (player page on :80, streamer on :8888),
-# a TURN relay, then the game streaming into it with no window.
+# a TURN relay, the one-player queue (:8099), then the game streaming into it with no window.
 # Stop everything with: pkill -f "Marswalk.uproject -game"
 # The Cloudflare tunnel (LaunchAgent earth.marswalk.tunnel) forwards play.marswalk.earth to :80.
 # Not a packaged build: the HUD and mission logic are Python, which only runs in the editor binary.
@@ -43,16 +43,22 @@ cat > "$LOGS/wilbur.json" <<EOF
 EOF
 (cd "$WILBUR" && exec node dist/index.js --config_file="$LOGS/wilbur.json") > "$LOGS/wilbur.out" 2>&1 &
 SIGNAL=$!
-trap 'kill $SIGNAL $TURN 2>/dev/null' EXIT
+# One player at a time: the tunnel sends / and /queue/* to this queue page (port 8099).
+python3 "$ROOT/tools/queue_server.py" > "$LOGS/queue.out" 2>&1 &
+QUEUE=$!
+trap 'kill $SIGNAL $TURN $QUEUE 2>/dev/null' EXIT
 sleep 2
 kill -0 $SIGNAL || { cat "$LOGS/wilbur.out"; exit 1; }
 kill -0 $TURN || { cat "$LOGS/turn.out"; exit 1; }
+kill -0 $QUEUE || { cat "$LOGS/queue.out"; exit 1; }
 echo "Signalling server up. Open http://localhost (or https://play.marswalk.earth)."
 caffeinate -i -w $$ &  # keep the Mac from idle-sleeping while hosting (the display may still sleep)
 
 # No window (-RenderOffScreen): a minimized window freezes the stream at 0 fps; offscreen runs ~34 fps.
 # Bitrate: the default 40 Mbit/s cap is more than a home upload or the relay can carry.
+# -muteaudio silences this Mac's speakers only: it zeroes the final output after Pixel Streaming
+# has captured the main submix, so viewers still hear the game.
 "$UE/Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor" "$ROOT/Marswalk/Marswalk.uproject" \
-  -game -RenderOffScreen -ResX=1600 -ResY=900 \
+  -game -RenderOffScreen -muteaudio -ResX=1600 -ResY=900 \
   -PixelStreamingConnectionURL=ws://127.0.0.1:8888 \
   -PixelStreamingWebRTCMaxBitrate=8000000 -PixelStreamingWebRTCStartBitrate=2000000 "$@"

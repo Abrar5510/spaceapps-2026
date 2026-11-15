@@ -75,7 +75,19 @@ tools/serve.sh
 
 Starts the Pixel Streaming 2 signalling server (player page on port 80, streamer on 8888), a TURN relay and the game streaming into it. The game renders offscreen with no window (a minimized window freezes the stream), and the Mac is kept awake while it runs. Stop everything with `pkill -f "Marswalk.uproject -game"`. The script also applies three fixes to the signalling server that ships with UE 5.8 (a leftover 5.7 package name, the commander version, and the static-file switch). A Cloudflare Tunnel running as a macOS LaunchAgent forwards https://play.marswalk.earth to port 80, so no ports are opened on the router.
 
-Cloudflare's tunnel carries only the web page, not the WebRTC video. For viewers outside the host's network, the video goes through a coturn TURN relay on the host (`brew install coturn`), published with Tailscale Funnel as TLS on port 8443. One-time setup: `tailscale funnel --bg --tls-terminated-tcp=8443 tcp://127.0.0.1:3478`. The stream is capped at 8 Mbit/s so a home upload can carry it. One machine streams to one or two viewers at a time.
+Cloudflare's tunnel carries only the web page, not the WebRTC video. For viewers outside the host's network, the video goes through a coturn TURN relay on the host (`brew install coturn`), published with Tailscale Funnel as TLS on port 8443. One-time setup: `tailscale funnel --bg --tls-terminated-tcp=8443 tcp://127.0.0.1:3478`. The stream is capped at 8 Mbit/s so a home upload can carry it, and the game runs with `-muteaudio`, which silences the host's speakers while viewers still hear it.
+
+One person plays at a time. The tunnel sends `/` and `/queue/*` to `tools/queue_server.py` (port 8099), which serves a waiting page (`tools/queue.html`): visitors see their place in line, and whoever is first gets the stream embedded with its WebSocket on `/ws`. A turn lasts up to 10 minutes, but only while someone is waiting, and each new player starts a fresh mission. `python3 tools/queue_server.py --test` checks the queue logic. Tunnel routes in `~/.cloudflared/config.yml`:
+
+```yaml
+ingress:
+  - hostname: play.marswalk.earth
+    path: ^/(queue/.*)?$
+    service: http://localhost:8099
+  - hostname: play.marswalk.earth
+    service: http://localhost:80
+  - service: http_status:404
+```
 
 The game runs from the editor binary in `-game` mode rather than as a packaged build, because the HUD and mission logic are Python, which only runs with the editor.
 
