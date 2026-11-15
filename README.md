@@ -2,12 +2,17 @@
 
 NASA Space Apps Challenge 2026 · Universal Event · Challenge: [Interplanetary Survival Guide: Martian Map](challenges/interplanetary-survival-guide-martian-map.md)
 Team page: https://www.spaceappschallenge.org/2026/find-a-team/dust-bearings/
+Source code: https://github.com/Abrar5510/spaceapps-2026
 
 **Play it live:** https://play.marswalk.earth (streamed from our machine when it is online; click to start) · **Demo video (30 s):** [`media/marswalk_demo.mp4`](media/marswalk_demo.mp4) · **Full walkthrough (102 s):** [`media/marswalk_full.mp4`](media/marswalk_full.mp4)
+
+> **About lag in the live demo.** The browser version will feel slower and blurrier than the game really is. It is not a packaged build: it is the Unreal editor binary running in `-game` mode on one home Mac, encoded to video and sent over a home internet upload capped at 8 Mbit/s, and for most outside viewers routed through a TURN relay over TCP. That adds input delay and compression artefacts. Run natively (see [Run it](#run-it)), the same scene plays much faster and smoother at full quality. The demo videos are recorded from the native game.
 
 ## Summary
 
 Marswalk is a hyperlocal map for one astronaut excursion: a 2 km × 2 km piece of Mount Sharp in Gale crater, where Curiosity explored boxwork ridges in 2025. The science goal is to sample a ridge and the hollow beside it to learn how long groundwater flowed there. We built the ground from NASA's 1 m HiRISE elevation model and 25 cm HiRISE image, layered THEMIS thermal inertia, slope and a hazard map, and planned a 2.0 km walking loop for a suited astronaut that avoids slopes over 20° and blocky rock. The loop visits four stops Curiosity actually drilled or imaged. It runs in Unreal Engine 5.8 and streams to a browser. In the habitat, the crew sees a plan view with route numbers, dose and weather. On the walk, a helmet HUD gives bearing and distance to the next stop, slope underfoot, elapsed time, radiation dose from Curiosity's RAD, time to sunset and the walk home, plus Curiosity's own photo of each stop. A solar-storm switch replays the May 2024 event RAD measured and tells the walker to turn back.
+
+Source code and build steps: https://github.com/Abrar5510/spaceapps-2026
 
 ## The mission
 
@@ -68,7 +73,7 @@ open -n --env DEVELOPER_DIR=/Volumes/Transend/Apps/Xcode.app/Contents/Developer 
 tools/serve.sh
 ```
 
-Starts the Pixel Streaming 2 signalling server (player page on port 80, streamer on 8888), a TURN relay and the standalone game streaming into it; closing the game or Ctrl+C stops all three. The script also applies three fixes to the signalling server that ships with UE 5.8 (a leftover 5.7 package name, the commander version, and the static-file switch). A Cloudflare Tunnel running as a macOS LaunchAgent forwards https://play.marswalk.earth to port 80, so no ports are opened on the router.
+Starts the Pixel Streaming 2 signalling server (player page on port 80, streamer on 8888), a TURN relay and the game streaming into it. The game renders offscreen with no window (a minimized window freezes the stream), and the Mac is kept awake while it runs. Stop everything with `pkill -f "Marswalk.uproject -game"`. The script also applies three fixes to the signalling server that ships with UE 5.8 (a leftover 5.7 package name, the commander version, and the static-file switch). A Cloudflare Tunnel running as a macOS LaunchAgent forwards https://play.marswalk.earth to port 80, so no ports are opened on the router.
 
 Cloudflare's tunnel carries only the web page, not the WebRTC video. For viewers outside the host's network, the video goes through a coturn TURN relay on the host (`brew install coturn`), published with Tailscale Funnel as TLS on port 8443. One-time setup: `tailscale funnel --bg --tls-terminated-tcp=8443 tcp://127.0.0.1:3478`. The stream is capped at 8 Mbit/s so a home upload can carry it. One machine streams to one or two viewers at a time.
 

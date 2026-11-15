@@ -1,7 +1,8 @@
 #!/bin/bash
 # Host the Marswalk demo at play.marswalk.earth.
 # Starts the Pixel Streaming 2 signalling server (player page on :80, streamer on :8888),
-# a TURN relay, then the standalone game streaming into it. Ctrl+C or closing the game stops all three.
+# a TURN relay, then the game streaming into it with no window.
+# Stop everything with: pkill -f "Marswalk.uproject -game"
 # The Cloudflare tunnel (LaunchAgent earth.marswalk.tunnel) forwards play.marswalk.earth to :80.
 # Not a packaged build: the HUD and mission logic are Python, which only runs in the editor binary.
 set -e
@@ -47,9 +48,11 @@ sleep 2
 kill -0 $SIGNAL || { cat "$LOGS/wilbur.out"; exit 1; }
 kill -0 $TURN || { cat "$LOGS/turn.out"; exit 1; }
 echo "Signalling server up. Open http://localhost (or https://play.marswalk.earth)."
+caffeinate -i -w $$ &  # keep the Mac from idle-sleeping while hosting (the display may still sleep)
 
+# No window (-RenderOffScreen): a minimized window freezes the stream at 0 fps; offscreen runs ~34 fps.
+# Bitrate: the default 40 Mbit/s cap is more than a home upload or the relay can carry.
 "$UE/Engine/Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor" "$ROOT/Marswalk/Marswalk.uproject" \
-  -game -windowed -ResX=1600 -ResY=900 \
+  -game -RenderOffScreen -ResX=1600 -ResY=900 \
   -PixelStreamingConnectionURL=ws://127.0.0.1:8888 \
   -PixelStreamingWebRTCMaxBitrate=8000000 -PixelStreamingWebRTCStartBitrate=2000000 "$@"
-# Bitrate: the default 40 Mbit/s cap is more than a home upload or the relay can carry.
