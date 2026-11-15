@@ -68,7 +68,9 @@ open -n --env DEVELOPER_DIR=/Volumes/Transend/Apps/Xcode.app/Contents/Developer 
 tools/serve.sh
 ```
 
-Starts the Pixel Streaming 2 signalling server (player page on port 80, streamer on 8888) and the standalone game streaming into it; closing the game or Ctrl+C stops both. The script also applies three fixes to the signalling server that ships with UE 5.8 (a leftover 5.7 package name, the commander version, and the static-file switch). A Cloudflare Tunnel running as a macOS LaunchAgent forwards https://play.marswalk.earth to port 80, so no ports are opened on the router. WebRTC uses Google's public STUN server; viewers behind strict firewalls would need a TURN server. One machine streams to one or two viewers at a time.
+Starts the Pixel Streaming 2 signalling server (player page on port 80, streamer on 8888), a TURN relay and the standalone game streaming into it; closing the game or Ctrl+C stops all three. The script also applies three fixes to the signalling server that ships with UE 5.8 (a leftover 5.7 package name, the commander version, and the static-file switch). A Cloudflare Tunnel running as a macOS LaunchAgent forwards https://play.marswalk.earth to port 80, so no ports are opened on the router.
+
+Cloudflare's tunnel carries only the web page, not the WebRTC video. For viewers outside the host's network, the video goes through a coturn TURN relay on the host (`brew install coturn`), published with Tailscale Funnel as TLS on port 8443. One-time setup: `tailscale funnel --bg --tls-terminated-tcp=8443 tcp://127.0.0.1:3478`. The stream is capped at 8 Mbit/s so a home upload can carry it. One machine streams to one or two viewers at a time.
 
 The game runs from the editor binary in `-game` mode rather than as a packaged build, because the HUD and mission logic are Python, which only runs with the editor.
 
