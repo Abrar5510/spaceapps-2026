@@ -16,7 +16,7 @@ from glb import write_glb  # noqa: E402
 SITE = Path(__file__).resolve().parents[1] / "data" / "site"
 OUT = SITE / "terrain"
 TILES = 4
-SKIRT_M = 4.0
+OVERLAP_M = 4
 
 
 def to_gltf(x, y, z):
@@ -37,26 +37,18 @@ def main():
     assert step * TILES == n - 1
     for tr in range(TILES):
         for tc in range(TILES):
-            r0, c0 = tr * step, tc * step
-            rr, cc = np.mgrid[r0:r0 + step + 1, c0:c0 + step + 1]
-            k = step + 1
+            # Each tile reaches OVERLAP_M into its neighbours: identical surface twice, so the seams stay closed
+            # when Nanite simplifies tile borders (a hanging skirt showed through as dark slivers).
+            r0, r1 = max(tr * step - OVERLAP_M, 0), min((tr + 1) * step + OVERLAP_M, n - 1)
+            c0, c1 = max(tc * step - OVERLAP_M, 0), min((tc + 1) * step + OVERLAP_M, n - 1)
+            rr, cc = np.mgrid[r0:r1 + 1, c0:c1 + 1]
             pos = to_gltf(cc * 100.0, rr * 100.0, zc[rr, cc]).reshape(-1, 3)
             nn = nrm[rr, cc]
             nor = to_gltf(nn[..., 0] * 100, nn[..., 1] * 100, nn[..., 2] * 100).reshape(-1, 3)
             uv = np.stack([cc / (n - 1), rr / (n - 1)], -1).reshape(-1, 2)
-            i = np.arange(k * k).reshape(k, k)
+            i = np.arange(rr.size).reshape(rr.shape)
             a, b, c, d = i[:-1, :-1], i[:-1, 1:], i[1:, :-1], i[1:, 1:]
             tris = [np.stack([a, c, b], -1).reshape(-1, 3), np.stack([b, c, d], -1).reshape(-1, 3)]
-            # Skirt: a 4 m curtain hanging from every tile edge hides hairline cracks between tiles.
-            ring = np.concatenate([i[0, :], i[1:, -1], i[-1, -2::-1], i[-2:0:-1, 0]])
-            base = len(pos)
-            drop = pos[ring] - np.array([0, SKIRT_M, 0])
-            pos = np.concatenate([pos, drop]); nor = np.concatenate([nor, nor[ring]]); uv = np.concatenate([uv, uv[ring]])
-            m = len(ring)
-            for j in range(m):
-                p, q = ring[j], ring[(j + 1) % m]
-                tris.append(np.array([[p, base + j, q], [q, base + j, base + (j + 1) % m],
-                                      [p, q, base + j], [q, base + (j + 1) % m, base + j]]))  # both faces
             write_glb(OUT / f"terrain_{tr}_{tc}.glb", pos, nor, uv, np.concatenate(tris))
     print(f"{TILES * TILES} tiles of {step + 1}^2 vertices -> {OUT}")
 

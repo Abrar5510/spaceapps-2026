@@ -3,6 +3,8 @@
 Team Dust & Bearings · NASA Space Apps 2026 · Interplanetary Survival Guide: Martian Map
 Written Sat 14 Nov 2026, 11:30 PKT. Times below are PKT.
 
+> **Status, Sun 15 Nov:** this is the plan as written on Saturday morning. What was built differs in places; the README and DATA.md describe the result. Main differences: the terrain is 16 Nanite meshes, not a Landscape; rocks are Poly Haven CC0 scans, not Megascans; Xcode was installed, so the game also runs as a standalone window; the Sun follows the mission clock instead of a slider; the walk became a playable EVA (oxygen, cores, the storm decision, airlock refill, debrief score); the rest of the HiRISE strip and NASA's Curiosity model were added as scenery.
+
 > **Confirm first:** the exact submission deadline on the Universal Event page. This plan assumes end of day Sun 15 Nov and aims to submit by 18:00 Sunday, leaving a buffer.
 
 ## 1. What we are building
@@ -133,12 +135,12 @@ Never cut: real terrain, three layers, the route, the dose number, the video.
 
 Brief:
 
-- [ ] One hyperlocal site with a stated science goal
-- [ ] At least three data types layered (plan has five)
-- [ ] Walking route that avoids steep and rocky ground, with distance, climb and time for a suited walker
-- [ ] Safety info: radiation dose and conditions
-- [ ] Rover point-of-view photos at the stops
-- [ ] Display format shown: helmet HUD and habitat screen
+- [x] One hyperlocal site with a stated science goal
+- [x] At least three data types layered (five)
+- [x] Walking route that avoids steep and rocky ground, with distance, climb and time for a suited walker
+- [x] Safety info: radiation dose and conditions
+- [x] Rover point-of-view photos at the stops
+- [x] Display format shown: helmet HUD and habitat screen
 
 Submission:
 

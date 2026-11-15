@@ -33,5 +33,5 @@ if __name__ == "__main__":
     else:
         path = os.path.abspath(sys.argv[1])
         d = os.path.dirname(path)
-        run(f"import runpy, sys; sys.path.insert(0, {d!r}); sys.modules.pop('common', None); "
+        run(f"import runpy, sys; sys.path.insert(0, {d!r}); [sys.modules.pop(m, None) for m in ('common', 'graph')]; "
             f"sys.argv={[path] + sys.argv[2:]!r}; runpy.run_path({path!r}, run_name='__main__')")

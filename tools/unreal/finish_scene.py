@@ -28,6 +28,7 @@ for st in read_csv("stops.csv"):
     tc.set_editor_property("text", ("H " if k == 0 else f"{k} ") + st["Title"])
     tc.set_editor_property("world_size", 3000.0)
     tc.set_editor_property("text_render_color", unreal.Color(255, 220, 120, 255))
+    tc.set_editor_property("cast_shadow", False)   # 30 m letters overhead would shade the ground in the editor view
     t.tags = ["PlanOnly"]
     t.set_actor_hidden_in_game(True)
 

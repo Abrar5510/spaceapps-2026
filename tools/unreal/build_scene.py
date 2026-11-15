@@ -66,6 +66,13 @@ def main():
     stops = read_csv("stops.csv")
     sun = {float(r["HourLMST"]): (float(r["ElevationDeg"]), float(r["AzimuthDeg"])) for r in read_csv("sun.csv")}
 
+    if "--terrain-only" in sys.argv:   # new tile meshes into the existing level: nothing else is touched
+        les.load_level(LEVEL)
+        for f in sorted(glob.glob(os.path.join(SITE, "terrain", "terrain_*.glb"))):
+            import_mesh(f, f"{GAME}/Terrain", os.path.splitext(os.path.basename(f))[0], nanite=True, complex_collision=True, reimport=True)
+        print("terrain tiles reimported")
+        return
+
     if not les.new_level(LEVEL):
         les.load_level(LEVEL)
         for a in eas.get_all_level_actors():

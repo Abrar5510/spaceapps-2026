@@ -57,6 +57,11 @@ def _run_pending():
 
 
 unreal.register_slate_post_tick_callback(_tick)
+try:  # keep rendering and running jobs while another app is in front
+    unreal.get_default_object(unreal.load_class(None, "/Script/UnrealEd.EditorPerformanceSettings")).set_editor_property(
+        "bThrottleCPUWhenNotForeground", False)
+except Exception:
+    pass  # -game has no editor settings
 
 import marswalk_hud  # noqa: E402  helmet HUD / plan view logic for PIE and -game
 

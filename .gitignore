@@ -22,3 +22,9 @@ data/raw/
 data/site/terrain/
 data/site/grids.npz
 data/site/nogo.npy
+
+# rebuilt by tools/far_terrain.py
+data/site/far_terrain.glb
+
+# intermediates rebuilt by tools/build_site.py from data/raw
+data/work/

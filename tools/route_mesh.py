@@ -31,14 +31,15 @@ def ribbon(pts, width, lift, path):
         tris += [(a, c, b), (b, c, d)]
     pos = to_gltf(v[:, 0], v[:, 1], v[:, 2])
     nrm = to_gltf(np.zeros(len(v)), np.zeros(len(v)), np.full(len(v), 100.0))
-    uv = np.stack([np.repeat(np.arange(len(pts)), 2) / len(pts), np.tile([0, 1], len(pts))], -1)
+    along = np.concatenate([[0.0], np.cumsum([math.dist(a, b) for a, b in zip(pts, pts[1:])])]) / 100.0
+    uv = np.stack([np.repeat(along, 2), np.tile([0, 1], len(pts))], -1)   # U = metres along the route
     write_glb(path, pos, nrm, uv, np.array(tris))
 
 
 def main():
     rows = list(csv.DictReader(open(SITE / "route.csv")))
     pts = [(float(r["X"]), float(r["Y"]), float(r["Z"])) for r in rows]
-    ribbon(pts, 30, 8, SITE / "route_walk.glb")         # 0.3 m line, 8 cm above ground
+    ribbon(pts, 22, 8, SITE / "route_walk.glb")         # 0.22 m line, 8 cm above ground
     ribbon(pts[::3] + [pts[-1]], 700, 150, SITE / "route_plan.glb")  # 7 m line for the overhead view
     print(len(pts), "route samples -> route_walk.glb, route_plan.glb")
 
